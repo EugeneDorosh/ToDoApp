@@ -1,0 +1,10 @@
+﻿TODO:
+- Why context doesnt work: done
+
+
+Features:
+- Accounts
+- Add front
+- Friends
+- Chatting
+- Sharing tasks
