@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Repository.Interfaces;
 using ToDoApp.Data;
 using ToDoApp.DTO;
-using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Models;
 
 namespace ToDoApp.Repositories

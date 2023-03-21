@@ -1,6 +1,6 @@
-﻿using ToDoApp.DTO.Response;
+﻿using Repository.Interfaces;
+using ToDoApp.DTO.Response;
 using ToDoApp.Interfaces;
-using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Interfaces.Validators;
 using ToDoApp.Models;
 

@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Repository.Interfaces;
 using ToDoApp.DTO.Response;
-using ToDoApp.Interfaces;
-using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Interfaces.Validators;
 using ToDoApp.Models;
 

@@ -1,4 +1,4 @@
-﻿namespace ToDoApp.Interfaces
+﻿namespace Repository.Interfaces
 {
     public interface IBaseRepository
     {

@@ -1,7 +1,7 @@
 ﻿using ToDoApp.Models;
 using ToDoApp.Models.Enums;
 
-namespace ToDoApp.Interfaces
+namespace Repository.Interfaces
 {
     public interface ITaskRepository : IBaseRepository
     {

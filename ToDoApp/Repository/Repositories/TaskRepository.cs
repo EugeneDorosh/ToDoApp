@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Repository.Interfaces;
 using System.Runtime.InteropServices;
 using ToDoApp.Data;
-using ToDoApp.Interfaces;
-using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Models;
 using ToDoApp.Models.Enums;
 

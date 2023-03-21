@@ -2,7 +2,7 @@
 using ToDoApp.DTO;
 using ToDoApp.Models;
 
-namespace ToDoApp.Interfaces.Repositories
+namespace Repository.Interfaces
 {
     public interface IUserRepository : IBaseRepository
     {
