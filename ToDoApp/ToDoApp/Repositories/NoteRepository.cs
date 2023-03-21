@@ -15,42 +15,43 @@ namespace ToDoApp.Repositories
         {
             _context = context;
         }
-        public bool CreateNote(Note note)
+        public async Task<bool> CreateNoteAsync(Note note)
         {
             _context.Add(note);
-            return Save();
+            return await SaveAsync();
         }
 
-        public bool DeleteNote(Note note)
+        public async Task<bool> DeleteNoteAsync(Guid noteId)
         {
+            var note = _context.Notes.FirstOrDefaultAsync(x => x.Id == noteId);
             _context.Remove(note);
-            return Save();
+            return await SaveAsync();
         }
 
-        public Note GetNote(Guid id)
+        public async Task<Note> GetNoteAsync(Guid id)
         {
-            return _context.Notes.FirstOrDefault(n => n.Id == id);
+            return await _context.Notes.FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public ICollection<Note> GetNotes(Guid id)
+        public async Task<ICollection<Note>> GetNotesAsync(Guid id)
         {
-            return _context.Notes.Where(n => n.UserId == id).ToList();
+            return await _context.Notes.Where(n => n.UserId == id).ToListAsync();
         }
 
-        public bool NoteExists(Guid id)
+        public async Task<bool> NoteExistsAsync(Guid id)
         {
-            return _context.Notes.Any(x => x.Id == id);
+            return await _context.Notes.AnyAsync(x => x.Id == id);
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public bool UpdateNote(Note note)
+        public async Task<bool> UpdateNoteAsync(Note note)
         {
             _context.Update(note);
-            return Save();
+            return await SaveAsync();
         }
     }
 }

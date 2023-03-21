@@ -1,4 +1,4 @@
-﻿using ToDoApp.DTO;
+﻿using ToDoApp.DTO.Response;
 using ToDoApp.Interfaces;
 using ToDoApp.Interfaces.Validators;
 
@@ -6,12 +6,12 @@ namespace ToDoApp.Validators
 {
     public class TaskValidation : ITaskValidationToDoApp
     {
-        public bool IsTaskValid(ToDoTaskDTO taskDTO)
+        public async Task<bool> IsTaskValid(ToDoTaskDto taskDTO)
         {
             if (taskDTO == null) 
                 return false;
 
-            if (taskDTO.DateTime <= DateTime.Now)
+            if (taskDTO.Deadline <= DateTime.Now)
                 return false;
 
             if ((int)taskDTO.Priority is < 0 or > 2)

@@ -1,8 +1,8 @@
 ﻿using ToDoApp.Models;
 
-namespace ToDoApp.DTO
+namespace ToDoApp.DTO.Response
 {
-    public class NoteDTO
+    public class NoteDto
     {
         public Guid Id { get; set; }
         public string Description { get; set; }

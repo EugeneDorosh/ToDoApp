@@ -1,10 +1,11 @@
-﻿using ToDoApp.DTO;
+﻿using ToDoApp.DTO.Response;
 using ToDoApp.Models;
 
 namespace ToDoApp.Interfaces.Validators
 {
     public interface IUserValidationToDoApp
     {
-        public bool IsUserValid(UserDTO userDTO);
+        public Task<bool> IsUserValidAsync(UserDto userDTO);
+        public Task<bool> IsUserValidAsync(CreateUserDto userDto);
     }
 }

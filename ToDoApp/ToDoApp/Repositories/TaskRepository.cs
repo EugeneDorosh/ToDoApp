@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 using ToDoApp.Data;
 using ToDoApp.Interfaces;
 using ToDoApp.Interfaces.Repositories;
@@ -15,48 +16,54 @@ namespace ToDoApp.Repositories
         {
             _context = context;
         }
-        public bool ChangeStatus(Guid id, Status status)
+        public async Task<bool> ChangeStatusAsync(Guid id, Status status)
         {
-            throw new NotImplementedException();
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
+            if (task == null)
+                return false;
+
+            task.Status = status;
+            return await SaveAsync();
         }
 
-        public bool CreateTask(ToDoTask task)
+        public async Task<bool> CreateTaskAsync(ToDoTask task)
         {
             _context.Add(task);
-            return Save();
+            return await SaveAsync();
         }
 
-        public bool DeleteTask(Guid id)
+        public async Task<bool> DeleteTaskAsync(Guid id)
         {
             ToDoTask taskToDelete = _context.Tasks.FirstOrDefault(t => t.Id == id);
             _context.Tasks.Remove(taskToDelete);
-            return Save();
+
+            return await SaveAsync();
         }
 
-        public ToDoTask GetTask(Guid id)
+        public async Task<ToDoTask> GetTaskAsync(Guid id)
         {
-            return _context.Tasks.FirstOrDefault(t => t.Id == id);
+            return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public ICollection<ToDoTask> GetTasks(Guid userId)
+        public async Task<ICollection<ToDoTask>> GetTasksAsync(Guid userId)
         {
-            return _context.Tasks.Where(t => t.UserId == userId).ToList();
+            return await _context.Tasks.Where(t => t.UserId == userId).ToListAsync();
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public bool TaskExists(Guid id)
+        public async Task<bool> TaskExistsAsync(Guid id)
         {
-            return _context.Tasks.Any(t => t.Id == id);
+            return await _context.Tasks.AnyAsync(t => t.Id == id);
         }
 
-        public bool UpdateTask(ToDoTask task)
+        public async Task<bool> UpdateTaskAsync(ToDoTask task)
         {
             _context.Update(task);
-            return Save();
+            return await SaveAsync();
         }
     }
 }

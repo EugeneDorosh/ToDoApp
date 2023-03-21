@@ -1,4 +1,4 @@
-﻿using ToDoApp.DTO;
+﻿using ToDoApp.DTO.Response;
 using ToDoApp.Interfaces;
 using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Interfaces.Validators;
@@ -14,7 +14,7 @@ namespace ToDoApp.Validation
         {
             _userRepository = userRepository;
         }
-        public bool IsNoteValid(NoteDTO noteDTO)
+        public async Task<bool> IsNoteValid(NoteDto noteDTO)
         {
             return true;
         }

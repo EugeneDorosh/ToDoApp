@@ -1,10 +1,10 @@
-﻿using ToDoApp.DTO;
+﻿using ToDoApp.DTO.Response;
 using ToDoApp.Models;
 
 namespace ToDoApp.Interfaces.Validators
 {
     public interface INoteValidationToDoApp
     {
-        public bool IsNoteValid(NoteDTO noteDTO);
+        public Task<bool> IsNoteValid(NoteDto noteDTO);
     }
 }

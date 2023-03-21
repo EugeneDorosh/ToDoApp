@@ -12,8 +12,8 @@ using ToDoApp.Data;
 namespace ToDoApp.Migrations
 {
     [DbContext(typeof(ToDoContext))]
-    [Migration("20230307151722_init")]
-    partial class init
+    [Migration("20230321175152_addingEmail")]
+    partial class addingEmail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,6 +79,10 @@ namespace ToDoApp.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .IsRequired()

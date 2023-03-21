@@ -1,17 +1,46 @@
-﻿using ToDoApp.DTO;
-using ToDoApp.Models;
+﻿using ToDoApp.Models;
 using ToDoApp.Interfaces.Validators;
+using ToDoApp.Interfaces.Repositories;
+using ToDoApp.DTO.Response;
+using System.ComponentModel.DataAnnotations;
 
 namespace ToDoApp.Validation
 {
     public class UserValidation : IUserValidationToDoApp
     {
-        public bool IsUserValid(UserDTO userDTO)
+        private readonly IUserRepository _userRepository;
+
+        public UserValidation(IUserRepository userRepository)
         {
-            if (userDTO == null)
+            _userRepository = userRepository;
+        }
+        public async Task<bool> IsUserValidAsync(UserDto userDto)
+        {
+            if (userDto == null)
                 return false;
 
-            if (userDTO.Username == null)
+            if (userDto.Username == null)
+                return false;
+
+            if (!await _userRepository.IsUsernameUnique(userDto.Username))
+                return false;
+
+            return true;
+        }
+
+        public async Task<bool> IsUserValidAsync(CreateUserDto userDto)
+        {
+            if (userDto == null)
+                return false;
+
+            if (userDto.Username == null)
+                return false;
+
+            if (!await _userRepository.IsUsernameUnique(userDto.Username))
+                return false;
+
+            var email = new EmailAddressAttribute();
+            if (!email.IsValid(userDto.Email))
                 return false;
 
             return true;

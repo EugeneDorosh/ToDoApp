@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ToDoApp.DTO;
+using ToDoApp.DTO.Response;
 using ToDoApp.Interfaces;
 using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Interfaces.Validators;
@@ -30,107 +30,145 @@ namespace ToDoApp.Controllers
         }
 
         [HttpPost("notes")]
-        [ProducesResponseType(200, Type = typeof(NoteDTO))]
+        [ProducesResponseType(200, Type = typeof(NoteDto))]
         [ProducesResponseType(400)]
-        public IActionResult GetNotes(Guid id)
+        public async Task<IActionResult> GetNotes(Guid id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (!_userRepository.UserExists(id))
-                return NotFound("User not found.");
+                bool doesUserExist = await _userRepository.UserExistsAsync(id);
+                if (!doesUserExist)
+                    return NotFound("User not found.");
 
-            var notes = _mapper.Map<IEnumerable<NoteDTO>>(_noteRepository.GetNotes(id));
+                var notes = await _noteRepository.GetNotesAsync(id);
+                var notesDTO = _mapper.Map<IEnumerable<NoteDto>>(notes);
 
-            return Ok(notes);
+                return Ok(notesDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost("notes/{noteId}")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<NoteDTO>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<NoteDto>))]
         [ProducesResponseType(400)]
-        public IActionResult GetNote(Guid noteId, [FromBody] Guid userId)
+        public async Task<IActionResult> GetNoteAsync(Guid noteId, [FromBody] Guid userId)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            Note note = _noteRepository.GetNote(noteId);
+                Note note = await _noteRepository.GetNoteAsync(noteId);
 
-            if (note == null)
-                return NotFound();
+                if (note == null)
+                    return NotFound();
 
-            if (userId != note.UserId)
-                return StatusCode(403);
+                if (userId != note.UserId)
+                    return StatusCode(403);
 
-            NoteDTO noteDTO = _mapper.Map<NoteDTO>(note);
+                NoteDto noteDTO = _mapper.Map<NoteDto>(note);
 
-            return Ok(noteDTO);
+                return Ok(noteDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost("notes/new")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateNote([FromBody] NoteDTO noteDTO, Guid userId)
+        public async Task<IActionResult> CreateNoteAsync([FromBody] NoteDto noteDTO, Guid userId)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (!_noteValidation.IsNoteValid(noteDTO))
-                return BadRequest("Incorrect note object.");
+                bool doesUserExist = await _userRepository.UserExistsAsync(userId);
+                if (!doesUserExist)
+                    return NotFound("User not found.");
 
-            if (!_userRepository.UserExists(userId))
-                return BadRequest("User doesnt exist.");
+                bool isNoteValid = await _noteValidation.IsNoteValid(noteDTO);
+                if (!isNoteValid)
+                    return BadRequest("Incorrect note object.");
 
-            Note note = _mapper.Map<Note>(noteDTO);
-            note.UserId = userId;
+                Note note = _mapper.Map<Note>(noteDTO);
+                note.UserId = userId;
 
-            if (!_noteRepository.CreateNote(note))
-                return BadRequest("Couldnt create task.");
+                if (!await _noteRepository.CreateNoteAsync(note))
+                    return BadRequest("Couldnt create task.");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("notes/{noteId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult DeleteNote([FromBody] Guid userId, Guid noteId)
+        public async Task<IActionResult> DeleteNoteAsync([FromBody] Guid userId, Guid noteId)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (!_userRepository.UserExists(userId))
-                return BadRequest("User doesnt exist.");
+                bool doesUserExist = await _userRepository.UserExistsAsync(userId);
+                if (!doesUserExist)
+                    return NotFound("User not found.");
 
-            Note note = _noteRepository.GetNote(noteId);
+                await _noteRepository.DeleteNoteAsync(noteId);
 
-            _noteRepository.DeleteNote(note);
-
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPut("notes/{userId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult UpdateNote([FromBody] NoteDTO noteDTO, Guid userId)
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> UpdateNoteAsync([FromBody] NoteDto noteDTO, Guid userId)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (!_noteValidation.IsNoteValid(noteDTO))
-                return BadRequest("Incorrect note object.");
+                bool doesUserExist = await _userRepository.UserExistsAsync(userId);
+                if (!doesUserExist)
+                    return NotFound("User not found.");
 
-            if (!_userRepository.UserExists(userId))
-                return NotFound("User doesnt exist.");
+                bool isNoteValid = await _noteValidation.IsNoteValid(noteDTO);
+                if (!isNoteValid)
+                    return BadRequest("Incorrect note object.");
 
-            if (!_noteRepository.NoteExists(noteDTO.Id))
-                return NotFound("Note doesnt exist.");
+                Note note = _mapper.Map<Note>(noteDTO);
+                note.UserId = userId;
 
-            Note note = _mapper.Map<Note>(noteDTO);
-            note.UserId = userId;
+                if (!await _noteRepository.UpdateNoteAsync(note))
+                    return BadRequest();
 
-            if (!_noteRepository.UpdateNote(note))
-                return BadRequest();
-
-            return NoContent();
+                return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

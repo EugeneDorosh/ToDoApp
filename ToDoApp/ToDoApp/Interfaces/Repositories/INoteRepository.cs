@@ -5,11 +5,11 @@ namespace ToDoApp.Interfaces
 {
     public interface INoteRepository : IBaseRepository
     {
-        public Note GetNote(Guid id);
-        public ICollection<Note> GetNotes(Guid id);
-        public bool CreateNote(Note note);
-        public bool UpdateNote(Note note);
-        public bool DeleteNote(Note note);
-        public bool NoteExists(Guid id);
+        public Task<Note> GetNoteAsync(Guid id);
+        public Task<ICollection<Note>> GetNotesAsync(Guid id);
+        public Task<bool> CreateNoteAsync(Note note);
+        public Task<bool> UpdateNoteAsync(Note note);
+        public Task<bool> DeleteNoteAsync(Guid noteId);
+        public Task<bool> NoteExistsAsync(Guid id);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ToDoApp.DTO;
+using ToDoApp.DTO.Response;
 using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Interfaces.Validators;
 using ToDoApp.Models;
@@ -27,96 +27,128 @@ namespace ToDoApp.Controllers
         }
 
         [HttpPost("users")]
-        [ProducesResponseType(200, Type = typeof(UserDTO))]
+        [ProducesResponseType(200, Type = typeof(UserDto))]
         [ProducesResponseType(400)]
-        public IActionResult GetUser([FromBody] Guid id)
+        public async Task<IActionResult> GetUserAsync([FromBody] Guid id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            User user = _userRepository.GetUser(id);
+                User user = await _userRepository.GetUserAsync(id);
 
-            if (user == null)
-                return NotFound();
+                if (user == null)
+                    return NotFound();
 
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
+                UserDto userDTO = _mapper.Map<UserDto>(user);
 
-            return Ok(userDTO);
+                return Ok(userDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("users")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<UserDTO>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<UserDto>))]
         [ProducesResponseType(400)]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var users = _mapper.Map<ICollection<UserDTO>>(_userRepository.GetUsers());
+                var users = await _userRepository.GetUsersAsync();
 
-            return Ok(users);
+                var usersDto = _mapper.Map<ICollection<UserDto>>(users);
+
+                return Ok(usersDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost("users/new")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateUser([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto userDTO)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (userDTO == null)
-                return BadRequest("user cannot be null.");
+                if (userDTO == null)
+                    return BadRequest("user cannot be null.");
 
-            if (!_userValidation.IsUserValid(userDTO))
-                return BadRequest("Incorrect user object.");
+                if (!await _userValidation.IsUserValidAsync(userDTO))
+                    return BadRequest("Incorrect user object.");
 
-            User user = _mapper.Map<User>(userDTO);
+                User user = _mapper.Map<User>(userDTO);
+                user.Id = Guid.NewGuid();
 
-            if (!_userRepository.CreateUser(user))
-                return BadRequest("User already exists.");
+                if (!await _userRepository.CreateUserAsync(user))
+                    return BadRequest("User already exists.");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("users")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult DeleteUser([FromBody] Guid id)
+        public async Task<IActionResult> DeleteUserAsync([FromBody] Guid id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            User user = _userRepository.GetUser(id);
+                if (!await _userRepository.DeleteUserAsync(id))
+                    return BadRequest("Something happen during remove user.");
 
-            if (user == null)
-                return BadRequest("No such user.");
-
-            if (!_userRepository.DeleteUser(user))
-                return BadRequest("Something happen during remove user.");
-
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPut("users")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult UpdateUser([FromBody] UserDTO userToUpdate)
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UserDto userToUpdate)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (!_userValidation.IsUserValid(userToUpdate))
-                return BadRequest("Incorrect user object.");
+                if (!await _userValidation.IsUserValidAsync(userToUpdate))
+                    return BadRequest("Incorrect user object.");
 
-            User user = _mapper.Map<User>(userToUpdate);
+                User user = _mapper.Map<User>(userToUpdate);
 
-            if (!_userRepository.UpdateUser(user))
-                return BadRequest("Something happen during updating user.");
+                if (!await _userRepository.UpdateUserAsync(user))
+                    return BadRequest("Something happen during updating user.");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
-
-        //TODO: think about dtos and how to connect front and back in future(user id etc) 
     }
 }

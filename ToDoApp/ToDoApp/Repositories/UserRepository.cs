@@ -1,4 +1,5 @@
-﻿using ToDoApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ToDoApp.Data;
 using ToDoApp.DTO;
 using ToDoApp.Interfaces.Repositories;
 using ToDoApp.Models;
@@ -14,59 +15,76 @@ namespace ToDoApp.Repositories
             _context = context;
         }
 
-        public bool CreateUser(User user)
+        public async Task<bool> CreateUserAsync(User user)
         {
-            if (!IsUsernameUnique(user.Username))
+            bool isUsernameUnique = await IsUsernameUnique(user.Username);
+            if (!isUsernameUnique)
                 return false;
 
-            if (UserExists(user.Id))
-                return false;
+            await _context.AddAsync(user);
 
-            _context.Add(user);
-
-            return Save();
+            return await SaveAsync();
         }
-        public bool DeleteUser(User user)
+        public async Task<bool> DeleteUserAsync(Guid userId)
         {
-            if (!UserExists(user.Id))
+            bool doesUserExist = await UserExistsAsync(userId);
+            if (!doesUserExist)
                 return false;
 
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             _context.Remove(user);
-            return Save();
+
+            return await SaveAsync();
         }
 
-        public User GetUser(Guid id)
+        public async Task<User> GetUserAsync(Guid id)
         {
-            return _context.Users.FirstOrDefault(u => u.Id == id);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public ICollection<User> GetUsers()
+        public async Task<ICollection<User>> GetUsersAsync()
         {
-            return _context.Users.ToList();
+            return await _context.Users.ToListAsync();
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public bool UpdateUser(User user)
+        public async Task<bool> UpdateUserAsync(User user)
         {
-            if (!UserExists(user.Id))
+            bool doesUserExist = await UserExistsAsync(user.Id);
+            if (!doesUserExist)
                 return false;
 
-            _context.Update(user);
-            return Save();
+            bool isUsernameUnique = await IsUsernameUnique(user.Username);
+            if (!isUsernameUnique)
+                return false;
+
+            _context.Update<User>(user);
+            return await SaveAsync();
         }
 
-        public bool UserExists(Guid id)
+        public async Task<bool> UserExistsAsync(Guid id)
         {
-            return _context.Users.Any(x => x.Id == id);
+            return await _context.Users.AnyAsync(x => x.Id == id);
         }
 
-        public bool IsUsernameUnique(string username)
+        //for creating user
+        public async Task<bool> IsUsernameUnique(string username)
         {
-            return !_context.Users.Any(x => x.Username == username);
+            return await _context.Users.AnyAsync(x => x.Username == username);
+        }
+        
+        //for updating user
+        public async Task<bool> IsUsernameUnique(User user)
+        {
+            User userFromDb = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+            if (userFromDb.Username == user.Username)
+                return true;
+
+            return await IsUsernameUnique(user.Username);
         }
     }
 }

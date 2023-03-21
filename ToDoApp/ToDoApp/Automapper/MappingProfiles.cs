@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using ToDoApp.DTO;
+using Microsoft.AspNetCore.Identity;
+using ToDoApp.DTO.Response;
 using ToDoApp.Models;
 
 namespace ToDoApp.Automapper
@@ -8,9 +9,10 @@ namespace ToDoApp.Automapper
     {
         public MappingProfiles()
         {
-            CreateMap<User, UserDTO>().ReverseMap();
-            CreateMap<Note, NoteDTO>().ReverseMap();
-            CreateMap<ToDoTask, ToDoTaskDTO>().ReverseMap();
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<Note, NoteDto>().ReverseMap();
+            CreateMap<ToDoTask, ToDoTaskDto>().ReverseMap();
+            CreateMap<CreateUserDto, User>();
         }
     }
 }

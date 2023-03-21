@@ -2,6 +2,6 @@
 {
     public interface IBaseRepository
     {
-        public bool Save();
+        public Task<bool> SaveAsync();
     }
 }
