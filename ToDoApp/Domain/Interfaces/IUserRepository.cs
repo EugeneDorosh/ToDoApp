@@ -1,5 +1,4 @@
-﻿using ToDoApp.Data;
-using ToDoApp.DTO;
+﻿using ToDoApp.DTO;
 using ToDoApp.Models;
 
 namespace Repository.Interfaces

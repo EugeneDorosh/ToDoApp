@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Service.Interface.IValidation;
 using ToDoApp.Data;
-using ToDoApp.Interfaces.Validators;
 using ToDoApp.Repositories;
 using ToDoApp.Validation;
 using ToDoApp.Validators;

@@ -1,7 +1,7 @@
 ﻿using ToDoApp.DTO.Response;
 using ToDoApp.Models;
 
-namespace ToDoApp.Interfaces.Validators
+namespace Service.Interface.IValidation
 {
     public interface ITaskValidationToDoApp
     {

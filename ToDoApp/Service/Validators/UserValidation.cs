@@ -1,8 +1,8 @@
 ﻿using ToDoApp.Models;
-using ToDoApp.Interfaces.Validators;
 using ToDoApp.DTO.Response;
 using System.ComponentModel.DataAnnotations;
 using Repository.Interfaces;
+using Service.Interface.IValidation;
 
 namespace ToDoApp.Validation
 {

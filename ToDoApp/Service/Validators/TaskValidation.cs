@@ -1,6 +1,5 @@
-﻿using ToDoApp.DTO.Response;
-using ToDoApp.Interfaces;
-using ToDoApp.Interfaces.Validators;
+﻿using Service.Interface.IValidation;
+using ToDoApp.DTO.Response;
 
 namespace ToDoApp.Validators
 {
