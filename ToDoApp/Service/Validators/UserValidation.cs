@@ -1,7 +1,7 @@
 ﻿using ToDoApp.Models;
 using ToDoApp.DTO.Response;
 using System.ComponentModel.DataAnnotations;
-using Repository.Interfaces;
+using Service.Interfaces;
 using Service.Interface.IValidation;
 
 namespace ToDoApp.Validation
@@ -28,7 +28,7 @@ namespace ToDoApp.Validation
             return true;
         }
 
-        public async Task<bool> IsUserValidAsync(CreateUserDto userDto)
+        public async Task<bool> IsUserValidAsync(UserRegistrationDto userDto)
         {
             if (userDto == null)
                 return false;
@@ -36,7 +36,7 @@ namespace ToDoApp.Validation
             if (userDto.Username == null)
                 return false;
 
-            if (!await _userRepository.IsUsernameUnique(userDto.Username))
+            if (await _userRepository.IsUsernameUnique(userDto.Username))
                 return false;
 
             var email = new EmailAddressAttribute();

@@ -1,4 +1,4 @@
-﻿namespace Repository.Interfaces
+﻿namespace Service.Interfaces
 {
     public interface IBaseRepository
     {

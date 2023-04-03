@@ -1,7 +1,7 @@
 ﻿using ToDoApp.DTO;
 using ToDoApp.Models;
 
-namespace Repository.Interfaces
+namespace Service.Interfaces
 {
     public interface INoteRepository : IBaseRepository
     {

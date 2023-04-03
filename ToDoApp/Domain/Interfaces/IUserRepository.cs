@@ -1,7 +1,8 @@
-﻿using ToDoApp.DTO;
+﻿using Microsoft.AspNetCore.Identity;
+using ToDoApp.DTO;
 using ToDoApp.Models;
 
-namespace Repository.Interfaces
+namespace Service.Interfaces
 {
     public interface IUserRepository : IBaseRepository
     {

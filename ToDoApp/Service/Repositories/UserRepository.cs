@@ -1,23 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Interfaces;
+﻿using Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Service.Interfaces;
 using ToDoApp.Data;
 using ToDoApp.DTO;
+using ToDoApp.DTO.Response;
 using ToDoApp.Models;
 
 namespace ToDoApp.Repositories
 {
+    // все таки треба створити ше 1 репозиторій, і окремий контроллер
     public class UserRepository : IUserRepository
     {
         private readonly ToDoContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public UserRepository(ToDoContext context)
+        public UserRepository(ToDoContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<bool> CreateUserAsync(User user)
         {
-            bool isUsernameUnique = await IsUsernameUnique(user.Username);
+            bool isUsernameUnique = await IsUsernameUnique(user.UserName);
             if (!isUsernameUnique)
                 return false;
 
@@ -58,7 +64,7 @@ namespace ToDoApp.Repositories
             if (!doesUserExist)
                 return false;
 
-            bool isUsernameUnique = await IsUsernameUnique(user.Username);
+            bool isUsernameUnique = await IsUsernameUnique(user.UserName);
             if (!isUsernameUnique)
                 return false;
 
@@ -74,17 +80,17 @@ namespace ToDoApp.Repositories
         //for creating user
         public async Task<bool> IsUsernameUnique(string username)
         {
-            return await _context.Users.AnyAsync(x => x.Username == username);
+            return await _context.Users.AnyAsync(x => x.UserName == username);
         }
         
         //for updating user
         public async Task<bool> IsUsernameUnique(User user)
         {
             User userFromDb = _context.Users.FirstOrDefault(u => u.Id == user.Id);
-            if (userFromDb.Username == user.Username)
+            if (userFromDb.UserName == user.UserName)
                 return true;
 
-            return await IsUsernameUnique(user.Username);
+            return await IsUsernameUnique(user.UserName);
         }
     }
 }

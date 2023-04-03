@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Repository.Interfaces;
+using Service.Interfaces;
 using Service.Interface.IValidation;
 using ToDoApp.DTO.Response;
 using ToDoApp.Models;
@@ -10,6 +11,7 @@ namespace ToDoApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class NotesController : ControllerBase
     {
         private readonly INoteRepository _noteRepository;

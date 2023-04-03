@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ToDoApp.Models;
 
 namespace ToDoApp.Data
 {
-    public class ToDoContext : DbContext
+    public class ToDoContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
     {
         public ToDoContext(DbContextOptions<ToDoContext> options) : base(options)
         {
@@ -12,6 +14,8 @@ namespace ToDoApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Note>()
                 .HasOne(n => n.User)
                 .WithMany(u => u.Notes)

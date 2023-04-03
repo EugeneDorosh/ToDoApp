@@ -1,52 +1,44 @@
 ﻿using AutoMapper;
 using Domain.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using Service.Interface.IValidation;
 using ToDoApp.DTO.Response;
 using ToDoApp.Models;
-using Service.Interface.ITokenHandler;
 
-namespace ToDoApp.Controllers
+namespace Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    public class UsersController : ControllerBase
+    [Authorize(Roles = "admin")]
+    public class AdminsController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserValidationToDoApp _userValidation;
-        private readonly ITokenHandler _tokenHandler;
+        private readonly IUserAuthenticationRepository _userAuthentication;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository,
+        public AdminsController(IUserRepository userRepository,
                                IUserValidationToDoApp userValidation,
-                               ITokenHandler tokenHandler,
+                               IUserAuthenticationRepository userAuthentication,
                                IMapper mapper)
         {
             _userRepository = userRepository;
             _userValidation = userValidation;
-            _tokenHandler = tokenHandler;
+            _userAuthentication = userAuthentication;
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpPost("users")]
         [ProducesResponseType(200, Type = typeof(UserDto))]
-        public async Task<IActionResult> GetUserAsync()
+        public async Task<IActionResult> GetUserAsync([FromBody] Guid id)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-
-                var token = HttpContext.Request.Cookies["jwt"];
-
-                Guid id = default;
-                if (!_tokenHandler.TryGetIdFromJwtToken(token, ref id))
-                    return BadRequest("Invalid token.");
 
                 User user = await _userRepository.GetUserAsync(id);
 
@@ -63,20 +55,35 @@ namespace ToDoApp.Controllers
             }
         }
 
-        [HttpDelete("users")]
-        [ProducesResponseType(204)]
-        public async Task<IActionResult> DeleteUserAsync()
+        [HttpGet("users")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<UserDto>))]
+        public async Task<IActionResult> GetUsers()
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var token = HttpContext.Request.Cookies["jwt"];
+                var users = await _userRepository.GetUsersAsync();
 
-                Guid id = default;
-                if (!_tokenHandler.TryGetIdFromJwtToken(token, ref id))
-                    return BadRequest("Invalid token.");
+                var usersDto = _mapper.Map<ICollection<UserDto>>(users);
+
+                return Ok(usersDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpDelete("users")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> DeleteUserAsync([FromBody] Guid id)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
                 if (!await _userRepository.DeleteUserAsync(id))
                     return BadRequest("Something happen during remove user.");
@@ -97,12 +104,6 @@ namespace ToDoApp.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-
-                var token = HttpContext.Request.Cookies["jwt"];
-
-                Guid id = default;
-                if (!_tokenHandler.TryGetIdFromJwtToken(token, ref id))
-                    return BadRequest("Invalid token.");
 
                 if (!await _userValidation.IsUserValidAsync(userToUpdate))
                     return BadRequest("Incorrect user object.");

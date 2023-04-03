@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Repository.Interfaces;
+using Service.Interfaces;
 using ToDoApp.Data;
 using ToDoApp.DTO;
 using ToDoApp.Models;
